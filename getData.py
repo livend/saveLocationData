@@ -1,5 +1,5 @@
 import csv
-
+import copy
 from bs4 import BeautifulSoup
 import requests
 
@@ -27,15 +27,15 @@ def getData():
         getData1(k, base_url + v)
 
         # 先测试一个
-        # break
+        break
 
 
 #  pcode pname, ccode cname,acode aname
 
 def getData1(provinceName, provinceUrl):
     print("===============:" + provinceName)
-    itemData = {}
-    itemData["pname"] = provinceName
+
+    pname = provinceName
 
     response = requests.request("GET", provinceUrl)
     html = response.content.decode("gbk", "ignore")
@@ -45,23 +45,23 @@ def getData1(provinceName, provinceUrl):
 
     if len(citys) <= 1:
         code = citys[0].contents[0].a.text
-        itemData["pcode"] = code[0:2]
-        itemData["cityName"] = provinceName
+        pcode = code[0:2]
+        cname = provinceName
         url = base_url + citys[0].contents[0].a['href']
-        itemData["ccode"] = "C" + code
-        getData2(itemData, url)
+        ccode = "C" + code
+        getData2(pcode, pname, ccode, cname, url)
     else:
         for city in citys:
             code = city.contents[0].a.text
-            itemData["pcode"] = code[0:2]
-            itemData["cityName"] = city.contents[1].a.text
+            pcode = code[0:2]
+            cname = city.contents[1].a.text
             url = base_url + city.contents[1].a["href"]
-            itemData["ccode"] = "C" + code
-            getData2(itemData, url)
+            ccode = "C" + code
+            getData2(pcode, pname, ccode, cname, url)
 
 
 # 保存到cvs文件中
-def getData2(data, url):
+def getData2(pcode, pname, ccode, cname, url):
     # 获取三级页面
     response = requests.request("GET", url)
     html = response.content.decode("gbk", "ignore")
@@ -72,15 +72,21 @@ def getData2(data, url):
             # 不保存
             continue
         else:
+            data = {}
             if (county.contents[0].a != None):
-                data['acode'] = "A" + county.contents[0].a.text
-                data['aname'] = county.contents[1].a.text
-                result.append(data)
+                acode = "A" + county.contents[0].a.text
+                aname = county.contents[1].a.text
             else:
-                data['acode'] = "A" + county.contents[0].text
-                data['aname'] = county.contents[1].text
-                result.append(data)
-            # 保存cvs文件
+                acode = "A" + county.contents[0].text
+                aname = county.contents[1].text
+            # 保存
+            data['pcode'] = pcode
+            data['pname'] = pname
+            data['ccode'] = ccode
+            data['cname'] = cname
+            data['acode'] = acode
+            data['aname'] = aname
+            result.append(data)
 
 
 if __name__ == '__main__':
