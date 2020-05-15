@@ -27,7 +27,7 @@ def getData():
         getData1(k, base_url + v)
 
         # 先测试一个
-        break
+        # break
 
 
 #  pcode pname, ccode cname,acode aname
