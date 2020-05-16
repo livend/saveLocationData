@@ -7,6 +7,7 @@ base_url = "http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2019/"
 result = []
 
 
+# 获取省份
 def getData():
     # 2019年最新的统计局最新的地域数据
     index_url = base_url + "index.html"
@@ -30,8 +31,7 @@ def getData():
         # break
 
 
-#  pcode pname, ccode cname,acode aname
-
+#  pcode pname, ccode cname,acode aname  获取城市
 def getData1(provinceName, provinceUrl):
     print("===============:" + provinceName)
 
@@ -43,24 +43,20 @@ def getData1(provinceName, provinceUrl):
     bs = BeautifulSoup(html, "lxml")  # 更快
     citys = bs.select('tr[class="citytr"]')
 
-    if len(citys) <= 1:
-        code = citys[0].contents[0].a.text
+    for city in citys:
+        # 特殊城市处理
+        cname = city.contents[1].a.text
+        if ((cname == "市辖区") | (cname == "县")):
+            cname = pname
+
+        code = city.contents[0].a.text
         pcode = code[0:2]
-        cname = provinceName
-        url = base_url + citys[0].contents[0].a['href']
+        url = base_url + city.contents[1].a["href"]
         ccode = "C" + code
         getData2(pcode, pname, ccode, cname, url)
-    else:
-        for city in citys:
-            code = city.contents[0].a.text
-            pcode = code[0:2]
-            cname = city.contents[1].a.text
-            url = base_url + city.contents[1].a["href"]
-            ccode = "C" + code
-            getData2(pcode, pname, ccode, cname, url)
 
 
-# 保存到cvs文件中
+# 保存到cvs文件中   == 获取区
 def getData2(pcode, pname, ccode, cname, url):
     # 获取三级页面
     response = requests.request("GET", url)
