@@ -49,6 +49,9 @@ def getData1(provinceName, provinceUrl):
         if ((cname == "市辖区") | (cname == "县")):
             cname = pname
 
+        if (cname == "省直辖县级行政区划"):
+            cname = ""
+
         code = city.contents[0].a.text
         pcode = code[0:2]
         url = base_url + city.contents[1].a["href"]
@@ -76,15 +79,19 @@ def getData2(pcode, pname, ccode, cname, url):
                 acode = "A" + county.contents[0].text
                 aname = county.contents[1].text
             # 保存
+            if (cname == ""):
+                data['cname'] = aname
+            else:
+                data['cname'] = cname
             data['pcode'] = pcode
             data['pname'] = pname
             data['ccode'] = ccode
-            data['cname'] = cname
             data['acode'] = acode
             data['aname'] = aname
             result.append(data)
 
 
+# 只到省市区级别
 if __name__ == '__main__':
     getData()
     with open('area.csv', 'w', newline='') as f:
