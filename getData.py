@@ -79,12 +79,12 @@ def getData2(pcode, pname, ccode, cname, url):
                 acode = "A" + county.contents[0].text
                 aname = county.contents[1].text
             # 保存
+            data['pcode'] = pcode
+            data['pname'] = pname
             if (cname == ""):
                 data['cname'] = aname
             else:
                 data['cname'] = cname
-            data['pcode'] = pcode
-            data['pname'] = pname
             data['ccode'] = ccode
             data['acode'] = acode
             data['aname'] = aname
